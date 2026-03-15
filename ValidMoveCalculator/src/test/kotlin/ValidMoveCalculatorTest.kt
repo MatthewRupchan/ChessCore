@@ -10,10 +10,10 @@ import kotlin.test.assertEquals
 
 class ValidMoveCalculatorTest {
 
-    private fun doTest(board: Board, expectedMoves: List<Move>, lastMove: Move?) {
+    private fun doTest(board: Board, expectedMoves: List<Move>, moveHistory: List<Move>) {
         assertEquals(
             expected = expectedMoves.toSet(),
-            actual = ValidMoveCalculatorImpl().getValidMoves(board, lastMove).toSet()
+            actual = ValidMoveCalculatorImpl().getValidMoves(board, moveHistory).toSet()
         )
     }
 
@@ -24,7 +24,7 @@ class ValidMoveCalculatorTest {
         doTest(
             Board(listOf(whitePawn, blackPawn)),
             listOf(Move(from = whitePawn, to = Piece.whitePawn(Location(Rank(4), File.D)))),
-            null
+            listOf()
         )
     }
 
@@ -35,7 +35,9 @@ class ValidMoveCalculatorTest {
         doTest(
             Board(listOf(whitePawn, blackPawn)),
             listOf(Move(from = whitePawn, to = Piece.whitePawn(Location(Rank(4), File.D)))),
-            Move(from = Piece.blackPawn(Location(Rank(7), File.D)), to = blackPawn)
+            listOf(
+                Move(from = Piece.blackPawn(Location(Rank(7), File.D)), to = blackPawn)
+            )
         )
     }
 
@@ -46,7 +48,9 @@ class ValidMoveCalculatorTest {
         doTest(
             Board(listOf(whitePawn, blackPawn)),
             listOf(Move(from = blackPawn, to = Piece.blackPawn(Location(Rank(5), File.D)))),
-            Move(from = Piece.whitePawn(Location(Rank(2), File.D)), to = whitePawn)
+            listOf(
+                Move(from = Piece.whitePawn(Location(Rank(2), File.D)), to = whitePawn)
+            )
         )
     }
 }

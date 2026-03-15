@@ -22,11 +22,23 @@ object ValidPawnMoveCalculator {
                 add(Move(from=pawn, to=pawn.atLocation(Location(nextRank, lastMove!!.to.location.file)), capture= lastMove.to))
             }
 
-            addAll(getForwardMove(pawn, board, nextRank))
+            addAll(getForwardMove(pawn, board))
 
-            addAll(getCaptures(pawn, board, nextRank))
+            addAll(getCaptures(pawn, board))
         }
     }
+
+    fun getControlledSquares(pawn: Piece): List<Location> {
+        val nextRank = getNextRank(pawn)
+        val captureLeft = pawn.location.file.leftOne()?.let { Location(nextRank, it) }
+        val captureRight = pawn.location.file.rightOne()?.let { Location(nextRank, it) }
+        return listOfNotNull(captureLeft, captureRight)
+    }
+
+    private fun getNextRank(pawn: Piece) = when(pawn.colour) {
+            Colour.WHITE -> Rank(pawn.location.rank.value + 1)
+            Colour.BLACK -> Rank(pawn.location.rank.value - 1)
+        }
 
     private fun isEnPassantPossible(pawn: Piece, lastMove: Move?): Boolean {
         if (lastMove == null) return false
@@ -42,8 +54,8 @@ object ValidPawnMoveCalculator {
         return true
     }
 
-    private fun getForwardMove(pawn: Piece, board: Board, nextRank: Rank):Set<Move> = buildSet {
-        val oneStepAhead = Location(nextRank, pawn.location.file)
+    private fun getForwardMove(pawn: Piece, board: Board):Set<Move> = buildSet {
+        val oneStepAhead = Location(getNextRank(pawn), pawn.location.file)
         if (board.isPieceAt(oneStepAhead) == null) {
             if (isNearPromoting(pawn)) {
                 logger.info("Pawn can step into promotion")
@@ -64,10 +76,8 @@ object ValidPawnMoveCalculator {
         }
     }
 
-    private fun getCaptures(pawn: Piece, board: Board, nextRank: Rank) = buildSet {
-        val captureLeft = pawn.location.file.leftOne()?.let { Location(nextRank, it) }
-        val captureRight = pawn.location.file.rightOne()?.let { Location(nextRank, it) }
-        val captureSquares = listOf(captureLeft, captureRight)
+    private fun getCaptures(pawn: Piece, board: Board) = buildSet {
+        val captureSquares = getControlledSquares(pawn)
 
         if (isNearPromoting(pawn)) {
             captureSquares.forEach { captureSquare ->

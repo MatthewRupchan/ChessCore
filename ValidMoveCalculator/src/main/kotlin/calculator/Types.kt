@@ -42,11 +42,38 @@ enum class File(val value: Int) {
         File.G -> File.H
         File.H -> null
     }
+
+    operator fun minus(other: Int): File? {
+        return File.fromValue(value - other)
+    }
+    operator fun plus(other: Int): File? {
+        return File.fromValue(value + other)
+    }
+    companion object {
+        fun fromValue(value: Int): File? = entries.find { it.value == value }
+    }
 }
 
 data class Rank(val value: Int) {
     init {
         require(value in 1..8) { "Value must be between 1 and 8, inclusive: $value" }
+    }
+
+    operator fun minus(other: Int): Rank? {
+        val new = value - other
+        return if (new in 1..8) {
+            Rank(new)
+        } else {
+            null
+        }
+    }
+    operator fun plus(other: Int): Rank? {
+        val new = value + other
+        return if (new in 1..8) {
+            Rank(new)
+        } else {
+            null
+        }
     }
 }
 
@@ -59,7 +86,15 @@ enum class PieceType {
     QUEEN,
 }
 
-data class Location(val rank: Rank, val file: File)
+data class Location(val rank: Rank, val file: File) {
+    operator fun plus(other: Pair<Int, Int>): Location? {
+        return (rank + other.first)?.let { r ->
+            (file + other.second)?.let { f ->
+                Location(r, f)
+            }
+        }
+    }
+}
 
 data class Piece(val colour: Colour, val pieceType: PieceType, val location: Location) {
     fun atLocation(newLocation: Location): Piece {
@@ -111,4 +146,15 @@ data class Board(val pieces: List<Piece>) {
     }
 }
 
-data class Move(val from: Piece, val to: Piece, val capture: Piece? = null)
+data class Move(val froms: List<Piece>, val tos: List<Piece>, val captures: Piece? = null) {
+    constructor(from: Piece, to: Piece, capture: Piece? = null) : this(listOf(from), listOf(to), capture)
+
+    val from: Piece
+        get() {
+            return froms.firstOrNull { it.pieceType == PieceType.KING } ?: froms.first()
+        }
+    val to: Piece
+        get() {
+            return tos.firstOrNull { it.pieceType == PieceType.KING } ?: tos.first()
+        }
+}
