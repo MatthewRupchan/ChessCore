@@ -42,11 +42,38 @@ enum class File(val value: Int) {
         File.G -> File.H
         File.H -> null
     }
+
+    operator fun minus(other: Int): File? {
+        return File.fromValue(value - other)
+    }
+    operator fun plus(other: Int): File? {
+        return File.fromValue(value + other)
+    }
+    companion object {
+        fun fromValue(value: Int): File? = entries.find { it.value == value }
+    }
 }
 
 data class Rank(val value: Int) {
     init {
         require(value in 1..8) { "Value must be between 1 and 8, inclusive: $value" }
+    }
+
+    operator fun minus(other: Int): Rank? {
+        val new = value - other
+        return if (new in 1..8) {
+            Rank(new)
+        } else {
+            null
+        }
+    }
+    operator fun plus(other: Int): Rank? {
+        val new = value + other
+        return if (new in 1..8) {
+            Rank(new)
+        } else {
+            null
+        }
     }
 }
 
