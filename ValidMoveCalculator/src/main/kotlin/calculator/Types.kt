@@ -13,7 +13,28 @@ enum class File(val value: Int) {
     E(5),
     F(6),
     G(7),
-    H(8)
+    H(8);
+
+    fun leftOne(): File? = when (this) {
+            File.A -> null
+            File.B -> File.A
+            File.C -> File.B
+            File.D -> File.C
+            File.E -> File.D
+            File.F -> File.E
+            File.G -> File.F
+            File.H -> File.G
+        }
+    fun rightOne(): File? = when (this) {
+        File.A -> File.B
+        File.B -> File.C
+        File.C -> File.D
+        File.D -> File.E
+        File.E -> File.F
+        File.F -> File.G
+        File.G -> File.H
+        File.H -> null
+    }
 }
 
 data class Rank(val value: Int) {
@@ -34,6 +55,9 @@ enum class PieceType {
 data class Location(val rank: Rank, val file: File)
 
 data class Piece(val colour: Colour, val pieceType: PieceType, val location: Location) {
+    fun atLocation(newLocation: Location): Piece {
+        return Piece(colour, pieceType, newLocation)
+    }
     companion object {
         fun whitePawn(location: Location): Piece {
             return Piece(Colour.WHITE, PieceType.PAWN, location)
@@ -74,6 +98,10 @@ data class Piece(val colour: Colour, val pieceType: PieceType, val location: Loc
     }
 }
 
-data class Board(val pieces: List<Piece>)
+data class Board(val pieces: List<Piece>) {
+    fun isPieceAt(location: Location): Piece? {
+        return pieces.find { piece -> piece.location == location }
+    }
+}
 
 data class Move(val from: Piece, val to: Piece, val capture: Piece? = null)
