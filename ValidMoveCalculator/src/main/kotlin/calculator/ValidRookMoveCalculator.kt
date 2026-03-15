@@ -1,5 +1,6 @@
 package calculator
 
+import calculator.StraightMovingPieceHelper.getFakeBoardForControlledSquares
 import calculator.StraightMovingPieceHelper.getMovesInDirection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,5 +27,9 @@ object ValidRookMoveCalculator {
                 (loc.file - 1)?.let { Location(loc.rank, it) }
             })
         }
+    }
+
+    fun getControlledSquares(rook: Piece, board: Board): List<Location> {
+        return getValidMoves(rook, getFakeBoardForControlledSquares(rook, board)).map { it.to.location }
     }
 }

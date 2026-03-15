@@ -32,4 +32,14 @@ object StraightMovingPieceHelper {
             }
         } while(true)
     }
+
+    fun getFakeBoardForControlledSquares(piece: Piece, board: Board): Board {
+        return Board(board.pieces.map {
+            if (it.colour == piece.colour) {
+                Piece(it.colour.opposite(), it.pieceType, it.location)
+            } else {
+                it
+            }
+        })
+    }
 }

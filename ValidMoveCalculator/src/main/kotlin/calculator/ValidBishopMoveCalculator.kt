@@ -1,5 +1,6 @@
 package calculator
 
+import calculator.StraightMovingPieceHelper.getFakeBoardForControlledSquares
 import calculator.StraightMovingPieceHelper.getMovesInDirection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,25 +15,21 @@ object ValidBishopMoveCalculator {
         }
         return buildSet {
             addAll(getMovesInDirection(bishop, board) { loc ->
-                (loc.rank + 1)?.let { r ->
-                    (loc.file + 1)?.let { f -> Location(r, f) }
-                }
+                loc + Pair(1, 1)
             })
             addAll(getMovesInDirection(bishop, board) { loc ->
-                (loc.rank + 1)?.let { r ->
-                    (loc.file - 1)?.let { f -> Location(r, f) }
-                }
+                loc + Pair(1, -1)
             })
             addAll(getMovesInDirection(bishop, board) { loc ->
-                (loc.rank - 1)?.let { r ->
-                    (loc.file + 1)?.let { f -> Location(r, f) }
-                }
+                loc + Pair(-1, 1)
             })
             addAll(getMovesInDirection(bishop, board) { loc ->
-                (loc.rank - 1)?.let { r ->
-                    (loc.file - 1)?.let { f -> Location(r, f) }
-                }
+                loc + Pair(-1, -1)
             })
         }
+    }
+
+    fun getControlledSquares(bishop: Piece, board: Board): List<Location> {
+        return getValidMoves(bishop, getFakeBoardForControlledSquares(bishop, board)).map { it.to.location }
     }
 }

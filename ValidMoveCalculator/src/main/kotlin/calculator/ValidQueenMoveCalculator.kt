@@ -1,5 +1,6 @@
 package calculator
 
+import calculator.StraightMovingPieceHelper.getFakeBoardForControlledSquares
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -15,5 +16,9 @@ object ValidQueenMoveCalculator {
             addAll(ValidRookMoveCalculator.getValidMoves(queen, board))
             addAll(ValidBishopMoveCalculator.getValidMoves(queen, board))
         }
+    }
+
+    fun getControlledSquares(queen: Piece, board: Board): List<Location> {
+        return getValidMoves(queen, getFakeBoardForControlledSquares(queen, board)).map { it.to.location }
     }
 }

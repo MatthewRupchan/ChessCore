@@ -12,7 +12,7 @@ object ValidKnightMoveCalculator {
             return setOf()
         }
         return buildSet {
-            getKnightLocations(knight).forEach { location ->
+            getControlledSquares(knight).forEach { location ->
                 val target = board.isPieceAt(location)
                 when {
                     target == null -> {
@@ -28,7 +28,7 @@ object ValidKnightMoveCalculator {
         }
     }
 
-    fun getKnightLocations(knight: Piece): List<Location> {
+    fun getControlledSquares(knight: Piece): List<Location> {
         return listOf(
             Pair(2, 1),
             Pair(2, -1),
@@ -38,12 +38,8 @@ object ValidKnightMoveCalculator {
             Pair(1, -2),
             Pair(-1, 2),
             Pair(-1, -2),
-        ).mapNotNull { (rank, file) ->
-            (knight.location.rank + rank)?.let { r ->
-                (knight.location.file + file)?.let { f ->
-                    Location(r,f)
-                }
-            }
+        ).mapNotNull { jump ->
+            knight.location + jump
         }
     }
 }
