@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ValidKnightMoveCalculatorTest {
-    private fun doTest(board: Board, knight: Piece, expectedMoves: List<Move>, lastMove: Move? = null) {
+    private fun doTest(board: Board, knight: Piece, expectedMoves: List<Move>) {
         assertEquals(
             expected = expectedMoves.toSet(),
-            actual = ValidKnightMoveCalculator.getValidMoves(knight, board, lastMove)
+            actual = ValidKnightMoveCalculator.getValidMoves(knight, board)
         )
     }
 

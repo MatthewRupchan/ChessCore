@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 object ValidKnightMoveCalculator {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    fun getValidMoves(knight: Piece, board: Board, lastMove: Move?): Set<Move> {
+    fun getValidMoves(knight: Piece, board: Board): Set<Move> {
         if (knight.pieceType != PieceType.KNIGHT) {
             logger.error("Asked to move $knight like a knight when it isn't a knight")
             return setOf()
