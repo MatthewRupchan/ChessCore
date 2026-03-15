@@ -2,7 +2,14 @@ package calculator
 
 enum class  Colour {
     WHITE,
-    BLACK
+    BLACK;
+
+    fun opposite(): Colour {
+        return when (this) {
+            Colour.WHITE -> Colour.BLACK
+            Colour.BLACK -> Colour.WHITE
+        }
+    }
 }
 
 enum class File(val value: Int) {
