@@ -18,7 +18,7 @@ object ValidPawnMoveCalculator {
             }
 
             if (isEnPassantPossible(pawn, lastMove)) {
-                logger.info("Pawn can en-passant")
+                logger.debug("Pawn can en-passant")
                 add(Move(from=pawn, to=pawn.atLocation(Location(nextRank, lastMove!!.to.location.file)), capture= lastMove.to))
             }
 
@@ -58,10 +58,10 @@ object ValidPawnMoveCalculator {
         val oneStepAhead = Location(getNextRank(pawn), pawn.location.file)
         if (board.isPieceAt(oneStepAhead) == null) {
             if (isNearPromoting(pawn)) {
-                logger.info("Pawn can step into promotion")
+                logger.debug("Pawn can step into promotion")
                 addAll(getPossiblePromotions(oneStepAhead, pawn.colour).map { Move(from=pawn, to=it) })
             } else {
-                logger.info("Pawn can step forward")
+                logger.debug("Pawn can step forward")
                 add(Move(from=pawn, to=pawn.atLocation(oneStepAhead)))
                 val jumpRank = when(pawn.colour) {
                     Colour.WHITE -> Rank(4)
@@ -69,7 +69,7 @@ object ValidPawnMoveCalculator {
                 }
                 val twoStepsAhead = Location(jumpRank, pawn.location.file)
                 if (isOnHomeRank(pawn) && board.isPieceAt(twoStepsAhead) == null) {
-                    logger.info("Pawn can take two steps forward")
+                    logger.debug("Pawn can take two steps forward")
                     add(Move(from=pawn, to=pawn.atLocation(twoStepsAhead)))
                 }
             }
@@ -82,14 +82,14 @@ object ValidPawnMoveCalculator {
         if (isNearPromoting(pawn)) {
             captureSquares.forEach { captureSquare ->
                 getPawnCapture(captureSquare, board, pawn)?.let { capturablePiece ->
-                    logger.info("Pawn can promote through capturing $capturablePiece")
+                    logger.debug("Pawn can promote through capturing $capturablePiece")
                     addAll(getPossiblePromotions(capturablePiece.location, pawn.colour).map { Move(from=pawn, to=it, capture=capturablePiece) })
                 }
             }
         } else {
             captureSquares.forEach { captureSquare ->
                 getPawnCapture(captureSquare, board, pawn)?.let { capturablePiece ->
-                    logger.info("Pawn can capture $capturablePiece")
+                    logger.debug("Pawn can capture $capturablePiece")
                     add(Move(from=pawn, to=pawn.atLocation(capturablePiece.location), capture = capturablePiece))
                 }
             }

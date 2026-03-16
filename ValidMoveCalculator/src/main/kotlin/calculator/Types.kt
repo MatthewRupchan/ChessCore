@@ -83,7 +83,7 @@ enum class PieceType {
     KNIGHT,
     BISHOP,
     KING,
-    QUEEN,
+    QUEEN;
 }
 
 data class Location(val rank: Rank, val file: File) {
@@ -93,6 +93,10 @@ data class Location(val rank: Rank, val file: File) {
                 Location(r, f)
             }
         }
+    }
+
+    fun getNotation(): String {
+        return "${file.name.lowercase()}${rank.value}"
     }
 }
 
@@ -144,6 +148,14 @@ data class Board(val pieces: List<Piece>) {
     fun isPieceAt(location: Location): Piece? {
         return pieces.find { piece -> piece.location == location }
     }
+
+    fun applyMove(move: Move): Board {
+        val pieces = pieces.toMutableList()
+        pieces.remove(move.from)
+        move.captures?.also { pieces.remove(it) }
+        pieces.add(move.to)
+        return Board(pieces.toList())
+    }
 }
 
 data class Move(val froms: List<Piece>, val tos: List<Piece>, val captures: Piece? = null) {
@@ -157,4 +169,34 @@ data class Move(val froms: List<Piece>, val tos: List<Piece>, val captures: Piec
         get() {
             return tos.firstOrNull { it.pieceType == PieceType.KING } ?: tos.first()
         }
+
+    fun getNotation(): String {
+        if (froms.size > 1) {
+            if (froms.first { it.pieceType == PieceType.ROOK }.location.file == File.H) {
+                return "0-0"
+            }
+            return "0-0-0"
+        }
+
+        val detailedNotation = from.location.getNotation() + (captures?.let { "x" } ?: "") + to.location.getNotation()
+
+        if (from.pieceType != to.pieceType) {
+            return when(to.pieceType) {
+                PieceType.ROOK -> "$detailedNotation=R"
+                PieceType.KNIGHT -> "$detailedNotation=N"
+                PieceType.BISHOP -> "$detailedNotation=B"
+                PieceType.QUEEN -> "$detailedNotation=Q"
+                else -> throw IllegalStateException("Pawns cannot promote like that $this")
+            }
+        }
+
+        return when(from.pieceType) {
+            PieceType.PAWN -> detailedNotation
+            PieceType.ROOK -> "R$detailedNotation"
+            PieceType.KNIGHT -> "N$detailedNotation"
+            PieceType.BISHOP -> "B$detailedNotation"
+            PieceType.KING -> "K$detailedNotation"
+            PieceType.QUEEN -> "Q$detailedNotation"
+        }
+    }
 }

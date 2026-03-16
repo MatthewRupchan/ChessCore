@@ -1,5 +1,8 @@
 package manager.application
 
+import calculator.ValidMoveCalculatorImpl
+import manager.flow.GameFlow
+
 fun main() {
-    println("Hello World")
+    GameFlow(ValidMoveCalculatorImpl()).startGame()
 }

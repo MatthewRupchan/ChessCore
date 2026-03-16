@@ -16,11 +16,11 @@ object ValidKnightMoveCalculator {
                 val target = board.isPieceAt(location)
                 when {
                     target == null -> {
-                        logger.info("Knight moving to $location")
+                        logger.debug("Knight moving to $location")
                         add(Move(from=knight, to=knight.atLocation(location)))
                     }
                     target.colour != knight.colour -> {
-                        logger.info("Knight capturing $target")
+                        logger.debug("Knight capturing $target")
                         add(Move(from = knight, to = knight.atLocation(location), capture = target))
                     }
                 }

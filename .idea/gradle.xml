@@ -20,6 +20,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ExampleChessBot" />
             <option value="$PROJECT_DIR$/GameManager" />
             <option value="$PROJECT_DIR$/ValidMoveCalculator" />
             <option value="$PROJECT_DIR$/buildSrc" />

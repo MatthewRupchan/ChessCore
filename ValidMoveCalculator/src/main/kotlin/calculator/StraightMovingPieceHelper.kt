@@ -18,14 +18,14 @@ object StraightMovingPieceHelper {
 
             when {
                 targetPiece == null -> {
-                    logger.info("${piece.pieceType} can move to $location")
+                    logger.debug("${piece.pieceType} can move to $location")
                     add(Move(from=piece, to=piece.atLocation(location)))
                 }
                 targetPiece.colour == piece.colour -> {
                     break;
                 }
                 targetPiece.colour != piece.colour -> {
-                    logger.info("${piece.pieceType} can capture $targetPiece")
+                    logger.debug("${piece.pieceType} can capture $targetPiece")
                     add(Move(from=piece, to=piece.atLocation(location), capture = targetPiece))
                     break;
                 }

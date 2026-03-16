@@ -1,16 +1,13 @@
 plugins {
     id("buildsrc.convention.kotlin-jvm")
-    application
+    alias(libs.plugins.kotlinPluginSerialization)
 }
 
 dependencies {
+    implementation(libs.bundles.kotlinxEcosystem)
     implementation(project(":ValidMoveCalculator"))
-    implementation(project(":ExampleChessBot"))
+    testImplementation(kotlin("test"))
 
     implementation(libs.slf4j)
     runtimeOnly(libs.logback)
-}
-
-application {
-    mainClass = "manager.application.MainKt"
 }
