@@ -8,5 +8,6 @@ dependencyResolutionManagement {
 include(":GameManager")
 include(":ValidMoveCalculator")
 include(":ExampleChessBot")
+include(":BasicBot")
 
 rootProject.name = "ChessCore"

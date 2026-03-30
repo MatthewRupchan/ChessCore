@@ -13,7 +13,7 @@ class ValidMoveCalculatorTest {
     private fun doTest(board: Board, expectedMoves: List<Move>, moveHistory: List<Move>) {
         assertEquals(
             expected = expectedMoves.toSet(),
-            actual = ValidMoveCalculatorImpl().getValidMoves(board, moveHistory).toSet()
+            actual = ValidMoveCalculatorImpl().getValidMoves(board, moveHistory, true).toSet()
         )
     }
 

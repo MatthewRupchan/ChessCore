@@ -1,5 +1,7 @@
 package calculator
 
+import kotlin.math.abs
+
 enum class  Colour {
     WHITE,
     BLACK;
@@ -95,6 +97,10 @@ data class Location(val rank: Rank, val file: File) {
         }
     }
 
+    operator fun minus(other: Location): Int {
+        return abs(other.file.value - file.value) + abs(other.rank.value - rank.value)
+    }
+
     fun getNotation(): String {
         return "${file.name.lowercase()}${rank.value}"
     }
@@ -104,6 +110,7 @@ data class Piece(val colour: Colour, val pieceType: PieceType, val location: Loc
     fun atLocation(newLocation: Location): Piece {
         return Piece(colour, pieceType, newLocation)
     }
+    fun getDebugString(): String = "Piece.${colour.toString().lowercase()}${pieceType.toString().lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}(Location(Rank(${location.rank.value}), File.${location.file.name}))"
     companion object {
         fun whitePawn(location: Location): Piece {
             return Piece(Colour.WHITE, PieceType.PAWN, location)
@@ -151,10 +158,18 @@ data class Board(val pieces: List<Piece>) {
 
     fun applyMove(move: Move): Board {
         val pieces = pieces.toMutableList()
-        pieces.remove(move.from)
+        move.froms.forEach {
+            pieces.remove(it)
+        }
+        move.tos.forEach {
+            pieces.add(it)
+        }
         move.captures?.also { pieces.remove(it) }
-        pieces.add(move.to)
         return Board(pieces.toList())
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
     }
 }
 

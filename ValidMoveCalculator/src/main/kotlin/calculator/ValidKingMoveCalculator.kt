@@ -24,7 +24,8 @@ object ValidKingMoveCalculator {
             })
 
 
-            val noKingMovesMadeYet = noKingMovesMade(king, moveHistory)
+            // and not in check
+            val noKingMovesMadeYet = noKingMovesMade(king, moveHistory) && (king.location !in opponentsSquares)
 
             if (noKingMovesMadeYet && kingRookCanCastle(king, board, moveHistory)) {
                 val transferSpaces = if (king.colour == Colour.WHITE) {
@@ -47,7 +48,7 @@ object ValidKingMoveCalculator {
                 val transferSpaces = if (king.colour == Colour.WHITE) {
                     listOf(Location(Rank(1), File.B), Location(Rank(1), File.C), Location(Rank(1), File.D))
                 } else {
-                    listOf(Location(Rank(8), File.B), Location(Rank(8), File.C), Location(Rank(1), File.D))
+                    listOf(Location(Rank(8), File.B), Location(Rank(8), File.C), Location(Rank(8), File.D))
                 }
 
                 val noPiecesInTheWay = board.pieces.none { it.location in transferSpaces }

@@ -1,5 +1,10 @@
 package manager.flow
 
+import basic.BoardScorer1
+import basic.BoardScorer2
+import basic.BoardScorer3
+import basic.FirstChessBot
+import basic.SecondChessBot
 import bot.ChessBot
 import calculator.Board
 import calculator.Colour
@@ -7,17 +12,28 @@ import calculator.File
 import calculator.Location
 import calculator.Move
 import calculator.Piece
-import calculator.PieceType
 import calculator.Rank
 import calculator.ValidMoveCalculator
+import example.ControllableChessBot
 import example.ExampleChessBot
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.collections.chunked
+import kotlin.collections.joinToString
 
 class GameFlow(val validMoves: ValidMoveCalculator) {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    private val possibleBots = mapOf<String, ChessBot>("Example Chess Bot" to ExampleChessBot())
+    private val possibleBots = mapOf(
+        "Stupid" to ExampleChessBot(),
+        "First" to FirstChessBot(),
+        "SecondA" to SecondChessBot(BoardScorer1()),
+        "SecondB" to SecondChessBot(BoardScorer2()),
+        "SecondC" to SecondChessBot(BoardScorer3()),
+        "Player" to ControllableChessBot(),
+    )
+
+    private val boards: MutableList<Board> = mutableListOf()
 
     fun startGame() {
         logger.info("Setting up game.")
@@ -35,14 +51,19 @@ class GameFlow(val validMoves: ValidMoveCalculator) {
         } while(black !in possibleBots.keys)
 
         logger.info("Initiating game between $white and $black")
-        runGame(possibleBots[white]!!, possibleBots[black]!!)
+        runGame(possibleBots[white]!!, possibleBots[black]!!).let { moves ->
+            logger.info("PEN: ${moves.map { it.getNotation() }.chunked(2).mapIndexed { num, moves -> "${num + 1}. ${moves.joinToString(" ")}" }.joinToString(" ")}")
+        }
     }
 
-    private fun runGame(white: ChessBot, black: ChessBot) {
+    private fun runGame(white: ChessBot, black: ChessBot): List<Move> {
         var board = getStartingBoard()
         val moves = mutableListOf<Move>()
 
+        boards.add(board)
+
         while(true) {
+        try {
             val lastFifty = moves.takeLast(100)
             if (lastFifty.size >= 100 && lastFifty.all { it.captures == null }) {
                 logger.info("Stalemate")
@@ -50,7 +71,7 @@ class GameFlow(val validMoves: ValidMoveCalculator) {
             }
 
             val possibleMoves = validMoves.getValidMoves(board, moves, true)
-            if (isCheckmate(board, possibleMoves, moves)) {
+            if (validMoves.isCheckmate(board, moves)) {
                 logger.info("Checkmate")
                 break
             }
@@ -61,7 +82,7 @@ class GameFlow(val validMoves: ValidMoveCalculator) {
             }
 
             val nextToMove = moves.lastOrNull()?.from?.colour?.opposite() ?: Colour.WHITE
-            val nextMove = when(nextToMove) {
+            val nextMove = when (nextToMove) {
                 Colour.WHITE -> white.getNextMove(possibleMoves, board, moves)
                 Colour.BLACK -> black.getNextMove(possibleMoves, board, moves)
             }
@@ -69,14 +90,25 @@ class GameFlow(val validMoves: ValidMoveCalculator) {
             logger.info("$nextToMove: ${nextMove.getNotation()}")
             moves.add(nextMove)
             board = board.applyMove(nextMove)
+            boards.add(board)
 
-            if (moves.size > 200) {
-                logger.info("Temp Exit Point")
+            if (boards.count { it == board } >= 3) {
+                logger.info("Position repeated 3 times, draw")
                 break
             }
+
+//            if (moves.size > 200) {
+//                logger.info("Temp Exit Point")
+//                break
+//            }
+        } catch (e: Exception) {
+            logger.error(e.message)
+            logger.error(e.stackTraceToString())
+            return moves
+        }
         }
 
-        logger.info("PEN: ${moves.map { it.getNotation() }.chunked(2).mapIndexed { num, moves -> "${num + 1}. ${moves.joinToString(" ")}" }.joinToString(" ")}")
+        return moves
     }
 
     private fun getStartingBoard(): Board {
@@ -102,22 +134,5 @@ class GameFlow(val validMoves: ValidMoveCalculator) {
             add(Piece.blackKnight(Location(Rank(8), File.G)))
             add(Piece.blackRook(Location(Rank(8), File.H)))
         })
-    }
-
-    private fun isCheckmate(board: Board, possibleMoves: Set<Move>, moveHistory: List<Move>): Boolean {
-        val attackingColour = moveHistory.lastOrNull()?.from?.colour ?: Colour.BLACK
-
-        val inCheck = validMoves.getValidMoves(board, moveHistory, false, attackingColour).any { it.captures?.pieceType == PieceType.KING }
-
-        if (inCheck) {
-            return possibleMoves.all { move ->
-                board.applyMove(move).let { foesNextTurnBoard ->
-                    validMoves.getValidMoves(foesNextTurnBoard, moveHistory.plus(move), false, attackingColour).any {
-                        it.captures?.pieceType == PieceType.KING
-                    }
-                }
-            }
-        }
-        return false
     }
 }
